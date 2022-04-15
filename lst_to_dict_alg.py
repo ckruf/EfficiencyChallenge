@@ -85,6 +85,30 @@ def lst_to_dict_fast(lst: List[int], start: int, end: int) -> Dict[int, Union[in
             result_dict[key] = original_index_dict[key]
     return result_dict
 
+def lst_to_dict_simple(lst: List[int], start: int, end: int) -> Dict[int, Union[int, None]]:
+    """
+    Given an unsorted list of integers, and two integers denoting a range - 'start' and 'end', 
+    create a dictionary whose keys are all the integers in the given range (inclusive) and whose values
+    are the indices of those numbers if the numbers are in the list, or None otherwise.
+    The proposed time complexity is O(n).
+
+    :param lst: list of unsorted integers
+    :param start: integer denoting start of range
+    :param end: integer denoting end of range
+    :return: dict with numbers in range as keys and indices or None as values.
+    """
+    result_dict = {}
+    # loop over entire list and add numbers that are within range
+    # as dict keys and their index as corresponding values. O(n).
+    for index, value in enumerate(lst):
+        if value >= start and value <= end:
+            result_dict[value] = index
+    # loop over range and corresponding value of numbers to either the index
+    # or None if number is not to be found. O(len(range))
+    for i in range(start, end + 1):
+        result_dict[i] = result_dict.get(i)
+    return result_dict
+
 def single_io_test(func: Callable[[List[int], int, int], Dict], test_lst: List[int], 
                     start: int, end: int, expected_result: Dict[int, Union[int, None]]) -> bool:
     """
@@ -250,15 +274,18 @@ def multiple_speed_trials(input_len: int, func: Callable[[List[int], int, int], 
     print(f"For function {func.__name__}, average time taken for input length {input_len} over {trial_count} trials was {average_time}ms")
     return average_time
 
-def run_tests(io_correctness: bool = True, comparative_correctness: bool = True, speed: bool = True, input_length: int = 10_000) -> None:
+def run_tests(io_correctness: bool = True, comparative_correctness: bool = True, speed: bool = True, input_length: int = 1_000_000) -> None:
     if io_correctness:
         _ = multiple_io_tests(lst_to_dict_slow)
         _ = multiple_io_tests(lst_to_dict_fast)
+        _ = multiple_io_tests(lst_to_dict_simple)
     if comparative_correctness:
         _ = comparative_tests(lst_to_dict_slow, lst_to_dict_fast)
+        _ = comparative_tests(lst_to_dict_simple, lst_to_dict_slow)
     if speed:
-        _ = single_speed_trial(input_length, lst_to_dict_slow)
+        # _ = single_speed_trial(input_length, lst_to_dict_slow)
         _ = single_speed_trial(input_length, lst_to_dict_fast)
+        _ = single_speed_trial(input_length, lst_to_dict_simple)
 
 
 if __name__ == '__main__':
